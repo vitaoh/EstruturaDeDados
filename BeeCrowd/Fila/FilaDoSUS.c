@@ -1,40 +1,52 @@
 #include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int chegada;
+    int condicao;
+    int tempo_limite;
+} Paciente;
 
 int main() {
-    int N = 1;
+    int n;
+    scanf("%d", &n);
     
-    while (0 < N && N <= 25) {
-        scanf("%d", &N);
-        if (N == 0) {
-            printf("0\n");
-            continue;
-        }
-        
-        int chegada[N], critico[N];
-        int h, m, c;
-
-        for (int i = 0; i < N; i++) {
-            scanf("%d %d %d", &h, &m, &c);
-            chegada[i] = (h - 7) * 60 + m;
-            critico[i] = c;
-        }
-        
-        int tempo_atual = 0;
-        int cont_criticos = 0;
-
-        for (int i = 0; i < N; i++) {
-            if (tempo_atual < chegada[i]) {
-                tempo_atual = chegada[i];
-            }
-            int espera = tempo_atual - chegada[i];
-            if (espera >= critico[i]) {
-                cont_criticos++;
-            }
-            tempo_atual += 30;
-        }
-
-        printf("%d\n", cont_criticos);
+    if (n == 0) {
+        printf("0\n");
+        return 0;
     }
     
+    Paciente *pacientes = (Paciente*)malloc(n * sizeof(Paciente));
+    
+    for (int i = 0; i < n; i++) {
+        int h, m, c;
+        scanf("%d %d %d", &h, &m, &c);
+        pacientes[i].chegada = h * 60 + m;
+        pacientes[i].condicao = c;
+        pacientes[i].tempo_limite = (c <= 720) ? c : 720;
+    }
+    
+    int tempo_atual = pacientes[0].chegada;
+    int atendidos = 0;
+    int criticos = 0;
+    
+    for (int i = 0; i < n; i++) {
+        if (pacientes[i].chegada > tempo_atual) {
+            tempo_atual = pacientes[i].chegada;
+        }
+        
+        int tempo_espera = tempo_atual - pacientes[i].chegada;
+        
+        if (tempo_espera >= pacientes[i].tempo_limite) {
+            criticos++;
+        }
+        
+        tempo_atual += 1;
+        atendidos++;
+    }
+    
+    printf("%d\n", criticos);
+    
+    free(pacientes);
     return 0;
 }
